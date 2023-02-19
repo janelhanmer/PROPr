@@ -1,13 +1,14 @@
 import numpy as np
-def get_rscore(t_dep,t_fat,t_pain,t_phys,t_slp,t_sr,t_ax,score_pi):
+# implementation of propr score for PROMIS
+# https://doi.org/10.1177/0272989X18776637 (Dewitt et al 2018).
+
+
+def get_propr_from_thetas(theta_dep, theta_fat, theta_pain, theta_phys, theta_slp, theta_sr, theta_cog):
+    """
+    :params are theta values of the seven domains. See below for conversion from tscores
+    :return: (PROPr score, (cognition_utility, depression_utility, fatigue_utility, pain_utility, physical_utility, sleep_utility, social_utility))
+    """
     to_dead = 1.021915
-    theta_dep = (t_dep-50)/10
-    theta_fat = (t_fat-50)/10
-    theta_pain  = (t_pain-50)/10
-    theta_phys  = (t_phys-50)/10
-    theta_slp  = (t_slp-50)/10
-    theta_sr  =   (t_sr-50)/10
-    theta_ax  =   (t_ax-50)/10
     turncog1 = -2.052
     turncog2 = -1.565
     turncog3 = -1.239
@@ -60,7 +61,7 @@ def get_rscore(t_dep,t_fat,t_pain,t_phys,t_slp,t_sr,t_ax,score_pi):
     turnsleep5 = 0.335
     turnsleep6 = 0.82
     turnsleep7 = 1.659
-    turnsleep8 = 1.934 
+    turnsleep8 = 1.934
     turnsocial1 = -2.088
     turnsocial2 = -1.634
     turnsocial3 = -1.293
@@ -188,85 +189,84 @@ def get_rscore(t_dep,t_fat,t_pain,t_phys,t_slp,t_sr,t_ax,score_pi):
     c_sleep = 0.5629657
     c_social = 0.6112686
     C = -0.9991828
-    theta_cog = 0.009 + (-0.037)*theta_dep + 0.118*theta_phys + (-0.223)*theta_slp + 0.051*theta_sr +(-0.168)*theta_ax + (-0.006)*score_pi
 
     cog_disutility = 1
-    cog_disutility = interceptcog1 + theta_cog * slopecog1 if (turncog1<= theta_cog) & (theta_cog< turncog2)  else cog_disutility
-    cog_disutility = interceptcog2 + theta_cog * slopecog2 if (turncog2<= theta_cog) & (theta_cog< turncog3) else cog_disutility
-    cog_disutility = interceptcog3 + theta_cog * slopecog3 if (turncog3<= theta_cog) & (theta_cog< turncog4) else cog_disutility
-    cog_disutility = interceptcog4 + theta_cog * slopecog4 if (turncog4<= theta_cog) & (theta_cog< turncog5) else cog_disutility
-    cog_disutility = interceptcog5 + theta_cog * slopecog5 if (turncog5<= theta_cog) & (theta_cog< turncog6) else cog_disutility
-    cog_disutility = interceptcog6 + theta_cog * slopecog6 if (turncog6<= theta_cog) & (theta_cog< turncog7) else cog_disutility
-    cog_disutility = interceptcog7 + theta_cog * slopecog7 if (turncog7<= theta_cog) & (theta_cog< turncog8) else cog_disutility
-    cog_disutility = interceptcog8 + theta_cog * slopecog8 if (turncog8<= theta_cog) & (theta_cog< turncog9) else cog_disutility
-    cog_disutility = 0 if turncog9<= theta_cog  else cog_disutility
+    cog_disutility = interceptcog1 + theta_cog * slopecog1 if (turncog1 <= theta_cog) & (theta_cog < turncog2) else cog_disutility
+    cog_disutility = interceptcog2 + theta_cog * slopecog2 if (turncog2 <= theta_cog) & (theta_cog < turncog3) else cog_disutility
+    cog_disutility = interceptcog3 + theta_cog * slopecog3 if (turncog3 <= theta_cog) & (theta_cog < turncog4) else cog_disutility
+    cog_disutility = interceptcog4 + theta_cog * slopecog4 if (turncog4 <= theta_cog) & (theta_cog < turncog5) else cog_disutility
+    cog_disutility = interceptcog5 + theta_cog * slopecog5 if (turncog5 <= theta_cog) & (theta_cog < turncog6) else cog_disutility
+    cog_disutility = interceptcog6 + theta_cog * slopecog6 if (turncog6 <= theta_cog) & (theta_cog < turncog7) else cog_disutility
+    cog_disutility = interceptcog7 + theta_cog * slopecog7 if (turncog7 <= theta_cog) & (theta_cog < turncog8) else cog_disutility
+    cog_disutility = interceptcog8 + theta_cog * slopecog8 if (turncog8 <= theta_cog) & (theta_cog < turncog9) else cog_disutility
+    cog_disutility = 0 if turncog9 <= theta_cog else cog_disutility
 
-    dep_disutility=0
-    dep_disutility = interceptdep1 + theta_dep * slopedep1 if (turndep1<= theta_dep) & (theta_dep< turndep2) else dep_disutility
-    dep_disutility = interceptdep2 + theta_dep * slopedep2 if (turndep2<= theta_dep) & (theta_dep< turndep3) else dep_disutility
-    dep_disutility = interceptdep3 + theta_dep * slopedep3 if (turndep3<= theta_dep) & (theta_dep< turndep4) else dep_disutility
-    dep_disutility = interceptdep4 + theta_dep * slopedep4 if (turndep4<= theta_dep) & (theta_dep< turndep5) else dep_disutility
-    dep_disutility = interceptdep5 + theta_dep * slopedep5 if (turndep5<= theta_dep) & (theta_dep< turndep6) else dep_disutility
-    dep_disutility = interceptdep6 + theta_dep * slopedep6 if (turndep6<= theta_dep) & (theta_dep< turndep7) else dep_disutility
-    dep_disutility = interceptdep7 + theta_dep * slopedep7 if (turndep7<= theta_dep) & (theta_dep< turndep8) else dep_disutility
-    dep_disutility = interceptdep8 + theta_dep * slopedep8 if (turndep8<= theta_dep) & (theta_dep< turndep9) else dep_disutility
-    dep_disutility = 1 if (turndep9<= theta_dep) else dep_disutility
+    dep_disutility = 0
+    dep_disutility = interceptdep1 + theta_dep * slopedep1 if (turndep1 <= theta_dep) & (theta_dep < turndep2) else dep_disutility
+    dep_disutility = interceptdep2 + theta_dep * slopedep2 if (turndep2 <= theta_dep) & (theta_dep < turndep3) else dep_disutility
+    dep_disutility = interceptdep3 + theta_dep * slopedep3 if (turndep3 <= theta_dep) & (theta_dep < turndep4) else dep_disutility
+    dep_disutility = interceptdep4 + theta_dep * slopedep4 if (turndep4 <= theta_dep) & (theta_dep < turndep5) else dep_disutility
+    dep_disutility = interceptdep5 + theta_dep * slopedep5 if (turndep5 <= theta_dep) & (theta_dep < turndep6) else dep_disutility
+    dep_disutility = interceptdep6 + theta_dep * slopedep6 if (turndep6 <= theta_dep) & (theta_dep < turndep7) else dep_disutility
+    dep_disutility = interceptdep7 + theta_dep * slopedep7 if (turndep7 <= theta_dep) & (theta_dep < turndep8) else dep_disutility
+    dep_disutility = interceptdep8 + theta_dep * slopedep8 if (turndep8 <= theta_dep) & (theta_dep < turndep9) else dep_disutility
+    dep_disutility = 1 if (turndep9 <= theta_dep) else dep_disutility
 
-    fat_disutility=0
-    fat_disutility = interceptfat1 + theta_fat * slopefat1 if (turnfat1<= theta_fat) & (theta_fat< turnfat2 ) else fat_disutility
-    fat_disutility = interceptfat2 + theta_fat * slopefat2 if (turnfat2<= theta_fat) & (theta_fat< turnfat3) else fat_disutility
-    fat_disutility = interceptfat3 + theta_fat * slopefat3 if (turnfat3<= theta_fat) & (theta_fat< turnfat4) else fat_disutility
-    fat_disutility = interceptfat4 + theta_fat * slopefat4 if (turnfat4<= theta_fat) & (theta_fat< turnfat5) else fat_disutility
-    fat_disutility = interceptfat5 + theta_fat * slopefat5 if (turnfat5<= theta_fat) & (theta_fat< turnfat6) else fat_disutility
-    fat_disutility = interceptfat6 + theta_fat * slopefat6 if (turnfat6<= theta_fat) & (theta_fat< turnfat7) else fat_disutility
-    fat_disutility = interceptfat7 + theta_fat * slopefat7 if (turnfat7<= theta_fat) & (theta_fat< turnfat8) else fat_disutility
-    fat_disutility = interceptfat8 + theta_fat * slopefat8 if (turnfat8<= theta_fat) & (theta_fat< turnfat9) else fat_disutility
-    fat_disutility = 1 if turnfat9<= theta_fat else fat_disutility
+    fat_disutility = 0
+    fat_disutility = interceptfat1 + theta_fat * slopefat1 if (turnfat1 <= theta_fat) & (theta_fat < turnfat2) else fat_disutility
+    fat_disutility = interceptfat2 + theta_fat * slopefat2 if (turnfat2 <= theta_fat) & (theta_fat < turnfat3) else fat_disutility
+    fat_disutility = interceptfat3 + theta_fat * slopefat3 if (turnfat3 <= theta_fat) & (theta_fat < turnfat4) else fat_disutility
+    fat_disutility = interceptfat4 + theta_fat * slopefat4 if (turnfat4 <= theta_fat) & (theta_fat < turnfat5) else fat_disutility
+    fat_disutility = interceptfat5 + theta_fat * slopefat5 if (turnfat5 <= theta_fat) & (theta_fat < turnfat6) else fat_disutility
+    fat_disutility = interceptfat6 + theta_fat * slopefat6 if (turnfat6 <= theta_fat) & (theta_fat < turnfat7) else fat_disutility
+    fat_disutility = interceptfat7 + theta_fat * slopefat7 if (turnfat7 <= theta_fat) & (theta_fat < turnfat8) else fat_disutility
+    fat_disutility = interceptfat8 + theta_fat * slopefat8 if (turnfat8 <= theta_fat) & (theta_fat < turnfat9) else fat_disutility
+    fat_disutility = 1 if turnfat9 <= theta_fat else fat_disutility
 
-    pain_disutility=0
-    pain_disutility = interceptpain1 + theta_pain * slopepain1 if (turnpain1<= theta_pain) & (theta_pain< turnpain2 ) else pain_disutility
-    pain_disutility = interceptpain2 + theta_pain * slopepain2 if (turnpain2<= theta_pain) & (theta_pain< turnpain3) else pain_disutility
-    pain_disutility = interceptpain3 + theta_pain * slopepain3 if (turnpain3<= theta_pain) & (theta_pain< turnpain4) else pain_disutility
-    pain_disutility = interceptpain4 + theta_pain * slopepain4 if (turnpain4<= theta_pain) & (theta_pain< turnpain5) else pain_disutility
-    pain_disutility = interceptpain5 + theta_pain * slopepain5 if (turnpain5<= theta_pain) & (theta_pain< turnpain6) else pain_disutility
-    pain_disutility = interceptpain6 + theta_pain * slopepain6 if (turnpain6<= theta_pain) & (theta_pain< turnpain7) else pain_disutility
-    pain_disutility = interceptpain7 + theta_pain * slopepain7 if (turnpain7<= theta_pain) & (theta_pain< turnpain8) else pain_disutility
-    pain_disutility = interceptpain8 + theta_pain * slopepain8 if (turnpain8<= theta_pain) & (theta_pain< turnpain9) else pain_disutility
-    pain_disutility = 1 if (turnpain9<= theta_pain) else pain_disutility
+    pain_disutility = 0
+    pain_disutility = interceptpain1 + theta_pain * slopepain1 if (turnpain1 <= theta_pain) & (theta_pain < turnpain2) else pain_disutility
+    pain_disutility = interceptpain2 + theta_pain * slopepain2 if (turnpain2 <= theta_pain) & (theta_pain < turnpain3) else pain_disutility
+    pain_disutility = interceptpain3 + theta_pain * slopepain3 if (turnpain3 <= theta_pain) & (theta_pain < turnpain4) else pain_disutility
+    pain_disutility = interceptpain4 + theta_pain * slopepain4 if (turnpain4 <= theta_pain) & (theta_pain < turnpain5) else pain_disutility
+    pain_disutility = interceptpain5 + theta_pain * slopepain5 if (turnpain5 <= theta_pain) & (theta_pain < turnpain6) else pain_disutility
+    pain_disutility = interceptpain6 + theta_pain * slopepain6 if (turnpain6 <= theta_pain) & (theta_pain < turnpain7) else pain_disutility
+    pain_disutility = interceptpain7 + theta_pain * slopepain7 if (turnpain7 <= theta_pain) & (theta_pain < turnpain8) else pain_disutility
+    pain_disutility = interceptpain8 + theta_pain * slopepain8 if (turnpain8 <= theta_pain) & (theta_pain < turnpain9) else pain_disutility
+    pain_disutility = 1 if (turnpain9 <= theta_pain) else pain_disutility
 
     physical_disutility = 1
-    physical_disutility = interceptphys1 + theta_phys * slopephys1 if (turnphys1<= theta_phys) & (theta_phys< turnphys2 ) else physical_disutility
-    physical_disutility = interceptphys2 + theta_phys * slopephys2 if (turnphys2<= theta_phys) & (theta_phys< turnphys3) else physical_disutility
-    physical_disutility = interceptphys3 + theta_phys * slopephys3 if (turnphys3<= theta_phys) & (theta_phys< turnphys4) else physical_disutility
-    physical_disutility = interceptphys4 + theta_phys * slopephys4 if (turnphys4<= theta_phys) & (theta_phys< turnphys5) else physical_disutility
-    physical_disutility = interceptphys5 + theta_phys * slopephys5 if (turnphys5<= theta_phys) & (theta_phys< turnphys6) else physical_disutility
-    physical_disutility = interceptphys6 + theta_phys * slopephys6 if (turnphys6<= theta_phys) & (theta_phys< turnphys7) else physical_disutility
-    physical_disutility = interceptphys7 + theta_phys * slopephys7 if (turnphys7<= theta_phys) & (theta_phys< turnphys8) else physical_disutility
-    physical_disutility = interceptphys8 + theta_phys * slopephys8 if (turnphys8<= theta_phys) & (theta_phys< turnphys9) else physical_disutility
-    physical_disutility = 0 if (turnphys9<= theta_phys ) else physical_disutility
+    physical_disutility = interceptphys1 + theta_phys * slopephys1 if (turnphys1 <= theta_phys) & (theta_phys < turnphys2) else physical_disutility
+    physical_disutility = interceptphys2 + theta_phys * slopephys2 if (turnphys2 <= theta_phys) & (theta_phys < turnphys3) else physical_disutility
+    physical_disutility = interceptphys3 + theta_phys * slopephys3 if (turnphys3 <= theta_phys) & (theta_phys < turnphys4) else physical_disutility
+    physical_disutility = interceptphys4 + theta_phys * slopephys4 if (turnphys4 <= theta_phys) & (theta_phys < turnphys5) else physical_disutility
+    physical_disutility = interceptphys5 + theta_phys * slopephys5 if (turnphys5 <= theta_phys) & (theta_phys < turnphys6) else physical_disutility
+    physical_disutility = interceptphys6 + theta_phys * slopephys6 if (turnphys6 <= theta_phys) & (theta_phys < turnphys7) else physical_disutility
+    physical_disutility = interceptphys7 + theta_phys * slopephys7 if (turnphys7 <= theta_phys) & (theta_phys < turnphys8) else physical_disutility
+    physical_disutility = interceptphys8 + theta_phys * slopephys8 if (turnphys8 <= theta_phys) & (theta_phys < turnphys9) else physical_disutility
+    physical_disutility = 0 if (turnphys9 <= theta_phys ) else physical_disutility
 
-    sleep_disutility=0
-    sleep_disutility = interceptsleep1 + theta_slp * slopesleep1 if (turnsleep1<= theta_slp) & (theta_slp< turnsleep2 ) else sleep_disutility
-    sleep_disutility = interceptsleep2 + theta_slp * slopesleep2 if (turnsleep2<= theta_slp) & (theta_slp< turnsleep3) else sleep_disutility
-    sleep_disutility = interceptsleep3 + theta_slp * slopesleep3 if (turnsleep3<= theta_slp) & (theta_slp< turnsleep4) else sleep_disutility
-    sleep_disutility = interceptsleep4 + theta_slp * slopesleep4 if (turnsleep4<= theta_slp) & (theta_slp< turnsleep5) else sleep_disutility
-    sleep_disutility = interceptsleep5 + theta_slp * slopesleep5 if (turnsleep5<= theta_slp) & (theta_slp< turnsleep6) else sleep_disutility
-    sleep_disutility = interceptsleep6 + theta_slp * slopesleep6 if (turnsleep6<= theta_slp) & (theta_slp< turnsleep7) else sleep_disutility
-    sleep_disutility = interceptsleep7 + theta_slp * slopesleep7 if (turnsleep7<= theta_slp) & (theta_slp< turnsleep8) else sleep_disutility
-    sleep_disutility = 1 if (turnsleep8<= theta_slp) else sleep_disutility
+    sleep_disutility = 0
+    sleep_disutility = interceptsleep1 + theta_slp * slopesleep1 if (turnsleep1 <= theta_slp) & (theta_slp < turnsleep2) else sleep_disutility
+    sleep_disutility = interceptsleep2 + theta_slp * slopesleep2 if (turnsleep2 <= theta_slp) & (theta_slp < turnsleep3) else sleep_disutility
+    sleep_disutility = interceptsleep3 + theta_slp * slopesleep3 if (turnsleep3 <= theta_slp) & (theta_slp < turnsleep4) else sleep_disutility
+    sleep_disutility = interceptsleep4 + theta_slp * slopesleep4 if (turnsleep4 <= theta_slp) & (theta_slp < turnsleep5) else sleep_disutility
+    sleep_disutility = interceptsleep5 + theta_slp * slopesleep5 if (turnsleep5 <= theta_slp) & (theta_slp < turnsleep6) else sleep_disutility
+    sleep_disutility = interceptsleep6 + theta_slp * slopesleep6 if (turnsleep6 <= theta_slp) & (theta_slp < turnsleep7) else sleep_disutility
+    sleep_disutility = interceptsleep7 + theta_slp * slopesleep7 if (turnsleep7 <= theta_slp) & (theta_slp < turnsleep8) else sleep_disutility
+    sleep_disutility = 1 if (turnsleep8 <= theta_slp) else sleep_disutility
 
     social_disutility = 1
-    social_disutility = interceptsocial1 + theta_sr * slopesocial1 if (turnsocial1<= theta_sr) & (theta_sr< turnsocial2 ) else social_disutility
-    social_disutility = interceptsocial2 + theta_sr * slopesocial2 if (turnsocial2<= theta_sr) & (theta_sr< turnsocial3) else social_disutility
-    social_disutility = interceptsocial3 + theta_sr * slopesocial3 if (turnsocial3<= theta_sr) & (theta_sr< turnsocial4) else social_disutility
-    social_disutility = interceptsocial4 + theta_sr * slopesocial4 if (turnsocial4<= theta_sr) & (theta_sr< turnsocial5) else social_disutility
-    social_disutility = interceptsocial5 + theta_sr * slopesocial5 if (turnsocial5<= theta_sr) & (theta_sr< turnsocial6) else social_disutility
-    social_disutility = interceptsocial6 + theta_sr * slopesocial6 if (turnsocial6<= theta_sr) & (theta_sr< turnsocial7) else social_disutility
-    social_disutility = interceptsocial7 + theta_sr * slopesocial7 if (turnsocial7<= theta_sr) & (theta_sr< turnsocial8) else social_disutility
-    social_disutility = interceptsocial8 + theta_sr * slopesocial8 if (turnsocial8<= theta_sr) & (theta_sr< turnsocial9) else social_disutility
-    social_disutility = 0 if (turnsocial9<= theta_sr) else social_disutility
+    social_disutility = interceptsocial1 + theta_sr * slopesocial1 if (turnsocial1 <= theta_sr) & (theta_sr < turnsocial2) else social_disutility
+    social_disutility = interceptsocial2 + theta_sr * slopesocial2 if (turnsocial2 <= theta_sr) & (theta_sr < turnsocial3) else social_disutility
+    social_disutility = interceptsocial3 + theta_sr * slopesocial3 if (turnsocial3 <= theta_sr) & (theta_sr < turnsocial4) else social_disutility
+    social_disutility = interceptsocial4 + theta_sr * slopesocial4 if (turnsocial4 <= theta_sr) & (theta_sr < turnsocial5) else social_disutility
+    social_disutility = interceptsocial5 + theta_sr * slopesocial5 if (turnsocial5 <= theta_sr) & (theta_sr < turnsocial6) else social_disutility
+    social_disutility = interceptsocial6 + theta_sr * slopesocial6 if (turnsocial6 <= theta_sr) & (theta_sr < turnsocial7) else social_disutility
+    social_disutility = interceptsocial7 + theta_sr * slopesocial7 if (turnsocial7 <= theta_sr) & (theta_sr < turnsocial8) else social_disutility
+    social_disutility = interceptsocial8 + theta_sr * slopesocial8 if (turnsocial8 <= theta_sr) & (theta_sr < turnsocial9) else social_disutility
+    social_disutility = 0 if (turnsocial9 <= theta_sr) else social_disutility
 
-    multi_attribute_disutility = (1/C) * ((1 + C * c_cognition * cog_disutility)*  (1 + C * c_depression * dep_disutility)* (1 + C * c_fatigue * fat_disutility)*  (1 + C * c_pain * pain_disutility)* (1 + C * c_physical * physical_disutility)*  (1 + C * c_sleep * sleep_disutility)* (1 + C * c_social * social_disutility) - 1) 
+    multi_attribute_disutility = (1/C) * ((1 + C * c_cognition * cog_disutility)*(1 + C * c_depression * dep_disutility)* (1 + C * c_fatigue * fat_disutility)*  (1 + C * c_pain * pain_disutility)* (1 + C * c_physical * physical_disutility)*  (1 + C * c_sleep * sleep_disutility)* (1 + C * c_social * social_disutility) - 1)
 
     PROPr = np.round(1 - to_dead * multi_attribute_disutility, 3)
 
@@ -277,4 +277,22 @@ def get_rscore(t_dep,t_fat,t_pain,t_phys,t_slp,t_sr,t_ax,score_pi):
     physical_utility = round(1 - physical_disutility, 3)
     sleep_utility = round(1 - sleep_disutility, 3)
     social_utility = round(1 - social_disutility, 3)
-    return PROPr
+    return PROPr, (cognition_utility, depression_utility, fatigue_utility, pain_utility, physical_utility, sleep_utility, social_utility)
+
+
+def get_propr_from_tscores(t_dep, t_fat, t_pain, t_phys, t_slp, t_sr, t_ax=None, t_cog=None, score_pi=None):
+    theta_dep = (t_dep-50)/10
+    theta_fat = (t_fat-50)/10
+    theta_pain = (t_pain-50)/10
+    theta_phys = (t_phys-50)/10
+    theta_slp = (t_slp-50)/10
+    theta_sr = (t_sr-50)/10
+
+    if t_ax:
+        theta_ax = (t_ax - 50) / 10
+        theta_cog = 0.009 + (-0.037)*theta_dep + 0.118*theta_phys + (-0.223)*theta_slp + 0.051*theta_sr +(-0.168)*theta_ax + (-0.006)*score_pi
+    elif t_cog:
+        theta_cog = (t_cog - 50) / 10
+    else:
+        raise Exception('Missing input param, must have either anxiety t-score or cog t-score')
+    return get_propr_from_thetas(theta_dep, theta_fat, theta_pain, theta_phys, theta_slp, theta_sr, theta_cog)
